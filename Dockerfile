@@ -25,4 +25,5 @@ RUN apt-get -o Acquire::Check-Valid-Until=false update \
 WORKDIR /app
 EXPOSE 8081
 COPY --from=builder /go/src/github.com/travelliu/fund/fund /app
+COPY config.yaml  /app
 ENTRYPOINT /app/fund
