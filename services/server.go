@@ -65,11 +65,12 @@ func initUc(repo repo) uc {
 
 func initHTTP(uc uc) *gin.Engine {
 	router := gin.New()
+	gin.SetMode(gin.ReleaseMode)
 	router.Use(middleware.GinLogger(logger), gin.Recovery(), trace.RequestID())
 	apiV1 := router.Group("/api/v1")
 	// apiV1.Use(trace.RequestID()
 	_userHttp.NewUserHTTP(apiV1, uc.userUC)
 	_fundHttp.NewFundHTTP(apiV1, uc.fundUC, uc.userUC)
 	return router
-	
+
 }

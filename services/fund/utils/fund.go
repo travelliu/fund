@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	_fundMod "github.com/travelliu/fund/services/fund/models"
+	_utils "github.com/travelliu/fund/utils"
 	"github.com/travelliu/fund/utils/databases"
 	"io/ioutil"
 	"net/http"
@@ -32,7 +33,7 @@ var apidata={ content:"<table class='w782 comm lsjz'><thead><tr><th class='first
 
 var (
 	fundBaseURL     = "http://fundgz.1234567.com.cn/js/%s.js"
-	fundDataBaseURL = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=%s&page=1&per=1&sdate=&edate="
+	fundDataBaseURL = "http://fund.eastmoney.com/f10/F10DataApi.aspx?type=lsjz&code=%s&page=1&per=2&sdate=&edate="
 )
 
 // ParseFundString Parse Fund
@@ -95,6 +96,9 @@ func GetFundInfo(code string) (*_fundMod.Fund, error) {
 		return nil, err
 	}
 	f.EquityPre = fData.EquityPre
+	f.Equity = fData.Equity
+	f.EquityDate = fData.EquityDate
+	f.EquityIncrease = fData.EquityIncrease
 	return f, nil
 }
 
@@ -104,7 +108,7 @@ func getFundInfo(code string) (*_fundMod.Fund, error) {
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)
-	
+
 	if err != nil {
 		// fmt.Println(err)
 		return nil, err
@@ -175,14 +179,32 @@ func convertFundData(data string) (*_fundMod.Fund, error) {
 			row = nil
 		})
 	})
+	if len(rows) < 1 {
+		return nil, fmt.Errorf("the parse failed")
+	}
 	equityPreStr := rows[0][3]
 	equityPreStr = strings.TrimRight(equityPreStr, "%")
+	equity, err := strconv.ParseFloat(rows[0][1], 64)
+	if err != nil {
+		return nil, err
+	}
 	equityPre, err := strconv.ParseFloat(equityPreStr, 64)
 	if err != nil {
-		return nil, nil
+		return nil, err
+	}
+	var equityIncrease float64
+	if len(rows) == 2 {
+		lastEquity, err := strconv.ParseFloat(rows[1][1], 64)
+		if err != nil {
+			return nil, err
+		}
+		equityIncrease = _utils.CalcFloat64(equity-lastEquity, 4)
 	}
 	f := _fundMod.FundBase{
-		EquityPre: equityPre,
+		EquityPre:      equityPre,
+		Equity:         equity,
+		EquityDate:     rows[0][0],
+		EquityIncrease: equityIncrease,
 	}
 	return &_fundMod.Fund{
 		FundBase: f,

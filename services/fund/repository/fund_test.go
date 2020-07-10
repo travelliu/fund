@@ -29,7 +29,7 @@ func Test_user_UpdateFund(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				fund: &_fundMod.Fund{
-					Model:    databases.Model{
+					Model: databases.Model{
 						ID: 1281180256048254976,
 					},
 					FundBase: _fundMod.FundBase{
@@ -41,10 +41,10 @@ func Test_user_UpdateFund(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &user{
+			r := &repo{
 				db: db,
 			}
-			if err := u.UpdateFund(tt.args.ctx, tt.args.fund); (err != nil) != tt.wantErr {
+			if err := r.UpdateFund(tt.args.ctx, tt.args.fund); (err != nil) != tt.wantErr {
 				t.Errorf("UpdateFund() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

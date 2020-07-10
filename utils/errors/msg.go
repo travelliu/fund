@@ -38,7 +38,7 @@ var (
 		SUCCESS: "Succeed",
 		ERROR:   "The system is abnormal, please contact the administrator",
 	}
-	
+
 	defaultErrorMsg = map[string]map[int]string{
 		LangZh: defaultZhMsg,
 		LangEn: defaultEnMsg,
@@ -77,5 +77,5 @@ func getMsg(code int, lang string, status int) string {
 		msg = errorMsg[status]
 	}
 	return msg
-	
+
 }

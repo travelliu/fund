@@ -78,10 +78,10 @@ func Test_user_CreateUserFund(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &user{
+			r := &repo{
 				db: db,
 			}
-			if err := u.CreateUserFund(tt.args.ctx, tt.args.userFund); (err != nil) != tt.wantErr {
+			if err := r.CreateUserFund(tt.args.ctx, tt.args.userFund); (err != nil) != tt.wantErr {
 				t.Errorf("CreateUserFund() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -110,10 +110,10 @@ func Test_user_DeleteUserFundByCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &user{
+			r := &repo{
 				db: db,
 			}
-			if err := u.DeleteUserFundByCode(tt.args.ctx, tt.args.userID, tt.args.code); (err != nil) != tt.wantErr {
+			if err := r.DeleteUserFundByCode(tt.args.ctx, tt.args.userID, tt.args.code); (err != nil) != tt.wantErr {
 				t.Errorf("DeleteUserFundByCode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -140,16 +140,15 @@ func Test_user_DeleteUserFundByUserID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &user{
+			r := &repo{
 				db: db,
 			}
-			if err := u.DeleteUserFundByUserID(tt.args.ctx, tt.args.userID); (err != nil) != tt.wantErr {
+			if err := r.DeleteUserFundByUserID(tt.args.ctx, tt.args.userID); (err != nil) != tt.wantErr {
 				t.Errorf("DeleteUserFundByUserID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
-
 
 func Test_user_QueryAllFund(t *testing.T) {
 	type fields struct {
@@ -165,16 +164,16 @@ func Test_user_QueryAllFund(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:"test",
+			name: "test",
 			args: args{ctx: ctx},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &user{
+			r := &repo{
 				db: db,
 			}
-			got, err := u.QueryAllFund(tt.args.ctx)
+			got, err := r.QueryAllFund(tt.args.ctx)
 			assert.NoError(t, err)
 			for _, g := range got {
 				fmt.Printf("%+v\n", g)

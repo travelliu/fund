@@ -24,11 +24,11 @@ func init() {
 	validate = validator.New()
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-		
+
 		if name == "-" {
 			return ""
 		}
-		
+
 		return name
 	})
 }
@@ -46,7 +46,7 @@ func NewFundHTTP(r *gin.RouterGroup, fundUC _fund.UseCase, userUc _user.UseCase)
 	userFund.Use(middleware.GinAuth(logger, userUc))
 	userFund.POST("", handler.CreateUserFund)
 	userFund.GET("", handler.GetUserFunds)
-	
+
 	userFundDetail := userFund.Group("/:fundCode")
 	userFundDetail.Use(UserFundMid(logger, fundUC))
 	userFundDetail.DELETE("", handler.DeleteUserFund)

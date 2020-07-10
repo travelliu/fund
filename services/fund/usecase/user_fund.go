@@ -11,33 +11,33 @@ import (
 )
 
 // CreateUserFund 用户添加或者修改基金
-func (f *fund) CreateUserFund(ctx context.Context, userFund *_fundMod.UserFund) (*_fundMod.UserFund,error) {
+func (f *fund) CreateUserFund(ctx context.Context, userFund *_fundMod.UserFund) (*_fundMod.UserFund, error) {
 	// 检查基金是否存在,没有则获取添加
 	var (
 		fund  *_fundMod.Fund
 		err   error
 		uFund *_fundMod.UserFund
 	)
-	if uFund, err = f.fundRepo.QueryUserFundByCode(ctx, userFund.UserID, userFund.Code); err != nil {
+	if uFund, err = f.fundRepo.QueryUserFundByUserIDAndCode(ctx, userFund.UserID, userFund.Code); err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryFundByCode error %s", err)
-		return nil,err
+		return nil, err
 	}
-	
+
 	if fund, err = f.fundRepo.QueryFundByCode(ctx, userFund.Code); err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryFundByCode error %s", err)
-		return nil,err
+		return nil, err
 	}
 	if fund.ID == 0 {
 		if fund, err = utils.GetFundInfo(userFund.Code); err != nil {
 			logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the GetFundInfo error %s", err)
-			return nil,err
+			return nil, err
 		}
 		if err := f.fundRepo.CreateFund(ctx, fund); err != nil {
 			logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the CreateFund error %s", err)
-			return nil,err
+			return nil, err
 		}
 	}
-	
+
 	calcUserFund(userFund, fund)
 	if uFund.ID == 0 {
 		// 添加基金
@@ -49,12 +49,12 @@ func (f *fund) CreateUserFund(ctx context.Context, userFund *_fundMod.UserFund) 
 		userFund.UserID = uFund.UserID
 		err = f.fundRepo.EditUserFund(ctx, userFund)
 	}
-	
+
 	if err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the CreateFund error %s", err)
-		return nil,err
+		return nil, err
 	}
-	return f.fundRepo.QueryUserFundByCode(ctx, userFund.UserID, userFund.Code)
+	return f.fundRepo.QueryUserFundByUserIDAndCode(ctx, userFund.UserID, userFund.Code)
 }
 
 // QueryUserFundByUserID 通过code查询基金
@@ -78,13 +78,12 @@ func (f *fund) QueryUserFundByUserID(ctx context.Context, userID int64) (*_fundM
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryFundByUserID error %s", err)
 		return nil, err
 	}
-	logger.Infof("%+v", funds)
 	userFunds, err := f.fundRepo.QueryUserFundByUserID(ctx, userID)
 	if err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryUserFundByUserID error %s", err)
 		return nil, err
 	}
-	
+
 	for _, uf := range userFunds {
 		for _, f := range funds {
 			if uf.Code != f.Code {
@@ -104,7 +103,7 @@ func (f *fund) QueryUserFundByUserID(ctx context.Context, userID int64) (*_fundM
 		TodayValuation = TodayValuation + uf.TodayValuation
 		TodayEquity = TodayEquity + uf.TodayEquity
 	}
-	
+
 	for _, uf := range userFundResponseList {
 		costPre := _utils.CalcFloat64(uf.CostAmount/CostAmount*100, 2)
 		uf.CostPre = costPre
@@ -121,9 +120,9 @@ func (f *fund) QueryUserFundByUserID(ctx context.Context, userID int64) (*_fundM
 	}, nil
 }
 
-// QueryUserFundByCode 查询用户基金code
-func (f *fund) QueryUserFundByCode(ctx context.Context, userID int64, code string) (*_fundMod.UserFund, error) {
-	return f.fundRepo.QueryUserFundByCode(ctx, userID, code)
+// QueryUserFundByUserIDAndCode 查询用户基金code
+func (f *fund) QueryUserFundByUserIDAndCode(ctx context.Context, userID int64, code string) (*_fundMod.UserFund, error) {
+	return f.fundRepo.QueryUserFundByUserIDAndCode(ctx, userID, code)
 }
 
 func calcUserFund(userFund *_fundMod.UserFund, fund *_fundMod.Fund) {
@@ -134,25 +133,25 @@ func calcUserFund(userFund *_fundMod.UserFund, fund *_fundMod.Fund) {
 	PurchasePer := float64(1) - float64(userFund.PurchasePer)/100                // 补仓价格. 最后净值*(1-百分比)
 	userFund.SellingPrice = _utils.CalcFloat64(userFund.CostPrice*sellingPer, 4) // 卖出价格. 成本价*(1+百分比)
 	userFund.PurchasePrice = _utils.CalcFloat64(fund.Equity*PurchasePer, 4)      // 补仓价格. 最后净值*(1-百分比)
-	
-	userFund.CostAmount = _utils.CalcFloat64(userFund.Shares*userFund.CostPrice, 2)      // 持仓金额
-	userFund.CostEquityAmount = _utils.CalcFloat64(userFund.Shares*fund.Equity, 2)       // 净值持仓金额
-	userFund.CostValuationAmount = _utils.CalcFloat64(userFund.Shares*fund.Valuation, 2) // 估值持仓金额
-	
-	userFund.TotalEquity = _utils.CalcFloat64(netDifference*userFund.Shares, 2)                           // 净值总收益
-	userFund.TotalEquityYield = _utils.CalcFloat64(userFund.TotalEquity/userFund.CostAmount*100, 2)       // 净值总收益率
-	userFund.TotalValuation = _utils.CalcFloat64(valuationDifference*userFund.Shares, 2)                  // 估值总收益
-	userFund.TotalValuationYield = _utils.CalcFloat64(userFund.TotalValuation/userFund.CostAmount*100, 2) // 估值总收益率
-	
-	userFund.TodayValuation = _utils.CalcFloat64(_utils.CalcFloat64(fund.Valuation-fund.Equity, 4)*userFund.Shares, 2) // 今日收益估值
+
+	userFund.CostAmount = _utils.CalcFloat64(userFund.Shares*userFund.CostPrice, 2) // 持仓金额
+	userFund.CostEquityAmount = _utils.CalcFloat64(userFund.Shares*fund.Equity, 2)  // 净值持仓金额
+
+	userFund.TotalEquity = _utils.CalcFloat64(netDifference*userFund.Shares, 2)                     // 净值总收益
+	userFund.TotalEquityYield = _utils.CalcFloat64(userFund.TotalEquity/userFund.CostAmount*100, 2) // 净值总收益率
+
+	if !CheckFundEquityEqValuation(fund) {
+		userFund.CostValuationAmount = _utils.CalcFloat64(userFund.Shares*fund.Valuation, 2)                               // 估值持仓金额
+		userFund.TotalValuation = _utils.CalcFloat64(valuationDifference*userFund.Shares, 2)                               // 估值总收益
+		userFund.TotalValuationYield = _utils.CalcFloat64(userFund.TotalValuation/userFund.CostAmount*100, 2)              // 估值总收益率
+		userFund.TodayValuation = _utils.CalcFloat64(_utils.CalcFloat64(fund.Valuation-fund.Equity, 4)*userFund.Shares, 2) // 今日收益估值
+	}
+
 	// 昨日或今日收益
-	yesEquityPre := _utils.CalcFloat64(fund.EquityPre/100, 4)
-	yesEquity := _utils.CalcFloat64(fund.Equity/(1+yesEquityPre), 4)
-	// fmt.Println(yesEquity,fund.Equity,yesEquityPre,1 + yesEquityPre,fund.Equity / (1 + yesEquityPre))
-	userFund.TodayEquity = _utils.CalcFloat64(_utils.CalcFloat64(fund.Equity-yesEquity, 4)*userFund.Shares, 2) // 今日收益估值
+	userFund.TodayEquity = _utils.CalcFloat64(fund.EquityIncrease*userFund.Shares, 2) // 今日收益估值
 }
 
 // DeleteUserFundByCode 删除用户基金
 func (f *fund) DeleteUserFundByCode(ctx context.Context, userID int64, code string) error {
-	return f.fundRepo.DeleteUserFundByCode(ctx,userID,code)
+	return f.fundRepo.DeleteUserFundByCode(ctx, userID, code)
 }

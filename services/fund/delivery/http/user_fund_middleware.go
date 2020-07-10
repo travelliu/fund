@@ -11,6 +11,7 @@ import (
 	"github.com/travelliu/fund/utils/trace"
 )
 
+// UserFundMid 用户基金中间件
 func UserFundMid(logger *logrus.Logger, fundUC _fund.UseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
@@ -21,7 +22,7 @@ func UserFundMid(logger *logrus.Logger, fundUC _fund.UseCase) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if uFund, err := fundUC.QueryUserFundByCode(ctx, userID, fundCode); err != nil {
+		if uFund, err := fundUC.QueryUserFundByUserIDAndCode(ctx, userID, fundCode); err != nil {
 			logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryFundByCode error %s", err)
 			_utils.HTTPRequestFailed(c, nil, _err.ERROR)
 			c.Abort()

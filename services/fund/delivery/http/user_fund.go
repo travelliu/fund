@@ -19,8 +19,8 @@ func (h *httpHandler) CreateUserFund(c *gin.Context) {
 		_utils.HTTPRequestFailed(c, err, _err.ERROR)
 		return
 	}
-	newUserFund,err := h.fundUC.CreateUserFund(ctx, userFund);
-	if  err != nil {
+	newUserFund, err := h.fundUC.CreateUserFund(ctx, userFund)
+	if err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the CreateUserFund error %s", err)
 		_utils.HTTPRequestFailed(c, err, _err.ERROR)
 		return
@@ -52,7 +52,7 @@ func getUserPost(c *gin.Context) (*_fundMod.UserFund, error) {
 	if err != nil {
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the BindJSON error %s", err)
 		params := _err.ConvertErrorToString(err)
-		
+
 		return nil, _err.New(_err.ErrInvalidParams, "", params)
 	}
 	if err := validate.Struct(&userFundPost); err != nil {

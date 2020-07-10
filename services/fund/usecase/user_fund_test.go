@@ -37,14 +37,15 @@ func Test_calcUserFund(t *testing.T) {
 				fund: &_fundMod.Fund{
 					Model: databases.Model{},
 					FundBase: _fundMod.FundBase{
-						Code:          "001618",
-						Name:          "天弘中证电子ETF联接C",
-						Equity:        1.5473,
-						EquityPre:     2.79,
-						EquityDate:    "2020-07-09",
-						Valuation:     1.5475,
-						ValuationPre:  2.80,
-						ValuationTime: databases.TimeInt64(time.Unix(1594278000, 0)),
+						Code:           "001618",
+						Name:           "天弘中证电子ETF联接C",
+						Equity:         1.5473,
+						EquityPre:      2.79,
+						EquityIncrease: 0.042,
+						EquityDate:     "2020-07-09",
+						Valuation:      1.5475,
+						ValuationPre:   2.80,
+						ValuationTime:  databases.TimeInt64(time.Unix(1594278000, 0)),
 					},
 				},
 			},
@@ -62,12 +63,13 @@ func Test_calcUserFund(t *testing.T) {
 				PurchasePrice:       1.4699,
 				CostAmount:          107179.02,
 				CostEquityAmount:    139102.58,
-				CostValuationAmount: 139120.56,
+				CostValuationAmount: 0,
 				TotalEquity:         31923.56,
 				TotalEquityYield:    29.79,
-				TotalValuation:      31941.54,
+				TotalValuation:      0,
+				TotalValuationYield: 0,
 				TodayEquity:         3775.81,
-				TodayValuation:      17.98,
+				TodayValuation:      0,
 			},
 		},
 		{
@@ -87,13 +89,14 @@ func Test_calcUserFund(t *testing.T) {
 				fund: &_fundMod.Fund{
 					Model: databases.Model{},
 					FundBase: _fundMod.FundBase{
-						Code:          "000746",
-						Equity:        3.215,
-						EquityPre:     2.95,
-						EquityDate:    "2020-07-09",
-						Valuation:     3.2247,
-						ValuationPre:  0.30,
-						ValuationTime: databases.TimeInt64(time.Unix(1594278000, 0)),
+						Code:           "000746",
+						Equity:         3.215,
+						EquityPre:      2.95,
+						EquityDate:     "2020-07-09",
+						EquityIncrease: 0.092,
+						Valuation:      3.2247,
+						ValuationPre:   0.30,
+						ValuationTime:  databases.TimeInt64(time.Unix(1594278000, 0)),
 					},
 				},
 			},
@@ -111,13 +114,13 @@ func Test_calcUserFund(t *testing.T) {
 				PurchasePrice:       3.0542,
 				CostAmount:          14750.01,
 				CostEquityAmount:    19912.36,
-				CostValuationAmount: 19972.44,
-				TodayEquity:         570.43,  // 昨日收益
-				TodayValuation:      60.08,   // 今日估值收益
+				CostValuationAmount: 0,
+				TodayEquity:         569.81,  // 昨日收益
+				TodayValuation:      0,       // 今日估值收益
 				TotalEquity:         5162.35, // 持有收益
 				TotalEquityYield:    35,      // 持有收益率
-				TotalValuation:      5222.43, // 估值收益
-				TotalValuationYield: 35.41,       // 估值收益
+				TotalValuation:      0,       // 估值收益
+				TotalValuationYield: 0,       // 估值收益
 			},
 		},
 	}

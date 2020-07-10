@@ -12,10 +12,10 @@ import (
 
 // Model 数据库base model
 type Model struct {
-	ID        int64      `json:"id,string" gorm:"primary_key"`
-	CreatedAt TimeInt64  `json:"createdAt" gorm:"type:datetime"`
-	UpdatedAt TimeInt64  `json:"updatedAt" gorm:"type:datetime"`
-	DeletedAt *TimeInt64 `json:"deletedAt" gorm:"type:datetime"`
+	ID        int64     `json:"id,string" gorm:"primary_key"`
+	CreatedAt TimeInt64 `json:"createdAt" gorm:"type:datetime"`
+	UpdatedAt TimeInt64 `json:"updatedAt" gorm:"type:datetime"`
+	// DeletedAt *TimeInt64 `json:"deletedAt" gorm:"type:datetime"`
 }
 
 // Int64Str Int64 String

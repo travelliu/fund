@@ -5,6 +5,7 @@ package databases
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	// 加载 sqlite 驱动
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/travelliu/fund/config"
 	"strings"

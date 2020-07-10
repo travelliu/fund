@@ -20,20 +20,23 @@ func init() {
 
 // NewFundRepository New Fund Repository
 func NewFundRepository(db *gorm.DB) _fund.Repository {
-	u := &user{db: db}
-	u.SyncDB()
-	return u
+	r := &repo{db: db}
+	r.SyncDB()
+	return r
 }
 
-type user struct {
+type repo struct {
 	db *gorm.DB
 }
 
-func (u *user) SetDB(db *gorm.DB) {
-	u.db = db
+func (r *repo) SetDB(db *gorm.DB) {
+	r.db = db
 }
 
-func (u *user) SyncDB() {
-	u.db.AutoMigrate(&_fundMod.Fund{},
-		&_fundMod.UserFund{})
+func (r *repo) SyncDB() {
+	r.db.AutoMigrate(&_fundMod.Fund{},
+		&_fundMod.UserFund{},
+		&_fundMod.FundHistory{},
+		&_fundMod.UserFundHistory{},
+	)
 }

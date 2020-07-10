@@ -24,6 +24,6 @@ type fundUc interface {
 type userFundUc interface {
 	CreateUserFund(ctx context.Context, userFund *_fundMod.UserFund) (*_fundMod.UserFund, error) // 添加或者修改
 	QueryUserFundByUserID(ctx context.Context, id int64) (*_fundMod.UserFundResponse, error)
-	QueryUserFundByCode(ctx context.Context, userID int64, code string) (*_fundMod.UserFund, error)
+	QueryUserFundByUserIDAndCode(ctx context.Context, userID int64, code string) (*_fundMod.UserFund, error)
 	DeleteUserFundByCode(ctx context.Context, userID int64, code string) error
 }
