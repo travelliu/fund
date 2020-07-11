@@ -12,6 +12,7 @@ import (
 	_fundRepo "github.com/travelliu/fund/services/fund/repository"
 	_fundUc "github.com/travelliu/fund/services/fund/usecase"
 	"github.com/travelliu/fund/services/middleware"
+	_system "github.com/travelliu/fund/services/system/delivery/http"
 	_user "github.com/travelliu/fund/services/user"
 	_userHttp "github.com/travelliu/fund/services/user/delivery/http"
 	_userRepo "github.com/travelliu/fund/services/user/repository"
@@ -71,6 +72,7 @@ func initHTTP(uc uc) *gin.Engine {
 	// apiV1.Use(trace.RequestID()
 	_userHttp.NewUserHTTP(apiV1, uc.userUC)
 	_fundHttp.NewFundHTTP(apiV1, uc.fundUC, uc.userUC)
+	_system.NewSystemHTTP(apiV1)
 	return router
 
 }

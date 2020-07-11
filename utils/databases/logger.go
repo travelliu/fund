@@ -37,8 +37,15 @@ func (nopLogger) Print(values ...interface{}) {
 		level           = values[0]
 		sql             string
 		formattedValues []string
+		file            = values[1]
 	)
 	if level != "sql" {
+		if err := values[2].(error); err != nil {
+			logger.WithFields(logrus.Fields{
+				"file": file,
+			}).Error(err)
+			return
+		}
 		logger.Info(values[2:]...)
 	}
 
@@ -96,7 +103,6 @@ func (nopLogger) Print(values ...interface{}) {
 
 	latencyTime := float64(values[2].(time.Duration).Nanoseconds()/1e4) / 100.0
 	returnString := fmt.Sprintf("%v", strconv.FormatInt(values[5].(int64), 10)+" rows affected or returned ")
-	file := values[1]
 
 	logger.WithFields(logrus.Fields{
 		"latencyTime": fmt.Sprintf("%.2fms", latencyTime),

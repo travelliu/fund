@@ -107,3 +107,27 @@ func (r *repo) DeleteUserFundByCode(ctx context.Context, userID int64, code stri
 	err := r.db.Where(userFund).Delete(userFund).Error
 	return err
 }
+
+func (r *repo) QueryUserFundAllByUserID(ctx context.Context, userID int64) error {
+	var (
+		userFund              = &_fundMod.UserFund{}
+		userFundResponseLists = []*_fundMod.UserFundResponseList{}
+	)
+	err := r.db.Table(
+		userFund.TableName(),
+	).Select(
+		"user_funds.*,funds.equity,funds.equity_pre,funds.equity_date,funds.equity_increase,funds.valuation"+
+			",funds.valuation_pre,funds.valuation_time").Joins("join funds on user_funds.code=funds.code").Where(
+		"user_funds.user_id = ?", userID,
+	).Order(
+		"equity desc", true,
+	).Scan(
+		&userFundResponseLists,
+	).Error
+	if err != nil {
+		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryUserFundAllByUserID error %s", err)
+		return err
+	}
+
+	return nil
+}

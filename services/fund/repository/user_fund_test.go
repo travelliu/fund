@@ -151,9 +151,6 @@ func Test_user_DeleteUserFundByUserID(t *testing.T) {
 }
 
 func Test_user_QueryAllFund(t *testing.T) {
-	type fields struct {
-		db *gorm.DB
-	}
 	type args struct {
 		ctx context.Context
 	}
@@ -177,6 +174,38 @@ func Test_user_QueryAllFund(t *testing.T) {
 			assert.NoError(t, err)
 			for _, g := range got {
 				fmt.Printf("%+v\n", g)
+			}
+		})
+	}
+}
+
+func Test_repo_QueryUserFundAllByUserID(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		userID int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "test",
+			args: args{
+				ctx:    ctx,
+				userID: 1281036673953566720,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &repo{
+				db: db,
+			}
+			r.SyncDB()
+			if err := r.QueryUserFundAllByUserID(tt.args.ctx, tt.args.userID); (err != nil) != tt.wantErr {
+				t.Errorf("QueryUserFundAllByUserID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
