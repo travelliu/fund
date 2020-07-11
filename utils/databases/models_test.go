@@ -94,10 +94,9 @@ func TestModel_MarshalJSON(t *testing.T) {
 				ID:        11111111111,
 				CreatedAt: TimeInt64(time.Unix(1594196275, 0)),
 				UpdatedAt: TimeInt64(time.Unix(1594196275, 0)),
-				DeletedAt: nil,
 			}},
 			wantErr: false,
-			want:    "{\"id\":\"11111111111\",\"CreatedAt\":\"1594196275000\",\"UpdatedAt\":\"1594196275000\",\"DeletedAt\":null}",
+			want:    "{\"id\":\"11111111111\",\"createdAt\":\"1594196275000\",\"updatedAt\":\"1594196275000\"}",
 		},
 	}
 	for _, tt := range tests {

@@ -67,11 +67,6 @@ func (f *fund) QueryUserFundByUserID(ctx context.Context, userID int64) (*_fundM
 		TotalEquity          float64 = 0 // 总收益
 		TodayValuation       float64 = 0 // 今日收益估值
 		TodayEquity          float64 = 0 // 今昨日收益估值
-		// YesterdayEarnings    float64 = 0 // 昨日收益
-		// TodayEarnings        float64 = 0 // 今日估算收益
-		// TotalEarningsPre     float64 = 0 // 总收益率
-		// YesterdayEarningsPre float64 = 0 // 昨日收益率
-		// TodayEarningsPre     float64 = 0 // 今日估算收益率
 	)
 	funds, err := f.fundRepo.QueryFundByUserID(ctx, userID)
 	if err != nil {
@@ -83,7 +78,18 @@ func (f *fund) QueryUserFundByUserID(ctx context.Context, userID int64) (*_fundM
 		logger.WithField(string(trace.ContextKeyReqID), trace.GetReqID(ctx)).Errorf("the QueryUserFundByUserID error %s", err)
 		return nil, err
 	}
-
+	if len(userFunds) == 0 {
+		return &_fundMod.UserFundResponse{
+			List:                userFundResponseList,
+			CostAmount:          0,
+			CostEquityAmount:    0,
+			CostValuationAmount: 0,
+			TotalEquity:         0,
+			TotalEquityYield:    0,
+			TodayEquity:         0,
+			TodayValuation:      0,
+		}, nil
+	}
 	for _, uf := range userFunds {
 		for _, f := range funds {
 			if uf.Code != f.Code {

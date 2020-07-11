@@ -95,3 +95,8 @@ func (t *TimeInt64) Scan(v interface{}) error {
 	}
 	return fmt.Errorf("can not convert %v to timestamp", v)
 }
+
+// Time convert to time.Time
+func (t TimeInt64) Time() time.Time {
+	return time.Time(t)
+}

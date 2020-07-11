@@ -23,7 +23,7 @@ func CatchRecover() {
 	if err := recover(); err != nil {
 		if logger != nil {
 			stack := stack(3)
-			logger.Errorf("[Recovery] %s panic recovered:\n%s%s",
+			logger.Errorf("[Recovery] panic recovered:\n%s%s",
 				err, stack)
 		}
 	}
